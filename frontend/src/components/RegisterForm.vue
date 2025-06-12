@@ -1,33 +1,32 @@
 <template>
   <form @submit.prevent="submitRegister">
-    <input v-model="email" type="email" placeholder="Email" required />
-    <input v-model="password" type="password" placeholder="Password" required minlength="6" />
+    <div>
+      <label for="email">Email:</label>
+      <input v-model="email" type="email" id="email" required />
+    </div>
+    <div>
+      <label for="password">Password:</label>
+      <input v-model="password" type="password" id="password" required />
+    </div>
     <button type="submit">Register</button>
-    <p v-if="message" style="color:green;">{{ message }}</p>
-    <p v-if="error" style="color:red;">{{ error }}</p>
   </form>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import { useAuthStore } from '../stores/authStore'
+import { useAuthStore } from '../stores/auth'
 
 const email = ref('')
 const password = ref('')
-const message = ref(null)
-const error = ref(null)
-const authStore = useAuthStore()
+
+const auth = useAuthStore()
 
 async function submitRegister() {
-  error.value = null
-  message.value = null
   try {
-    await authStore.register(email.value, password.value)
-    message.value = 'Registration successful! Please login.'
-    email.value = ''
-    password.value = ''
-  } catch (e) {
-    error.value = e.response?.data?.message || 'Registration failed'
+    await auth.register(email.value, password.value)
+    alert('สมัครสมาชิกสำเร็จ! ไป login ได้เลย')
+  } catch (error) {
+    alert('สมัครสมาชิกล้มเหลว: ' + (error.response?.data?.message || error.message))
   }
 }
 </script>

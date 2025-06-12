@@ -1,28 +1,33 @@
 <template>
   <form @submit.prevent="submitLogin">
-    <input v-model="email" type="email" placeholder="Email" required />
-    <input v-model="password" type="password" placeholder="Password" required />
+    <div>
+      <label for="email">Email:</label>
+      <input v-model="email" type="email" id="email" required />
+    </div>
+    <div>
+      <label for="password">Password:</label>
+      <input v-model="password" type="password" id="password" required />
+    </div>
     <button type="submit">Login</button>
-    <p v-if="error" style="color:red;">{{ error }}</p>
   </form>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import { useAuthStore } from '../stores/authStore'
+import { useAuthStore } from '../stores/auth'
 
 const email = ref('')
 const password = ref('')
-const error = ref(null)
-const authStore = useAuthStore()
+
+const auth = useAuthStore()
 
 async function submitLogin() {
-  error.value = null
   try {
-    await authStore.login(email.value, password.value)
-    emit('login-success')
-  } catch (e) {
-    error.value = e.response?.data?.message || 'Login failed'
+    await auth.login(email.value, password.value)
+    const event = new CustomEvent('login-success')
+    window.dispatchEvent(event)
+  } catch (error) {
+    alert('Login ล้มเหลว: ' + (error.response?.data?.message || error.message))
   }
 }
 </script>

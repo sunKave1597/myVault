@@ -13,7 +13,6 @@ import LoginForm from '../components/LoginForm.vue'
 import RegisterForm from '../components/RegisterForm.vue'
 
 function onLoginSuccess() {
-  // TODO: redirect to vault page
   alert('Login successful! (ต่อไปทำหน้า Vault)')
 }
 </script>
