@@ -10,11 +10,18 @@ exports.register = async (req, res) => {
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
+      await logAudit({
+        userId: null,
+        action: 'REGISTER_FAIL',
+        entity: 'User',
+        entityId: null,
+        detail: `Failed registration attempt with email: ${email} (already registered)`,
+        req
+      });
       return res.status(400).json({ message: 'Email already registered' });
     }
 
     const passwordHash = await argon2.hash(password);
-
     const user = new User({ email, passwordHash });
     await user.save();
 
@@ -23,7 +30,8 @@ exports.register = async (req, res) => {
       action: 'REGISTER',
       entity: 'User',
       entityId: user._id,
-      detail: `User registered with email: ${email}`
+      detail: `User registered with email: ${email}`,
+      req
     });
 
     res.status(201).json({ message: 'User registered successfully' });
@@ -38,11 +46,12 @@ exports.login = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) {
       await logAudit({
-        userId: null,  // เพราะ user ไม่เจอ อาจเก็บเป็น null หรือ 'unknown'
+        userId: null,
         action: 'LOGIN_FAIL',
         entity: 'User',
         entityId: null,
-        detail: `Failed login attempt with email: ${email} (user not found)`
+        detail: `Failed login attempt with email: ${email} (user not found)`,
+        req
       });
       return res.status(400).json({ message: 'Invalid email or password' });
     }
@@ -54,7 +63,8 @@ exports.login = async (req, res) => {
         action: 'LOGIN_FAIL',
         entity: 'User',
         entityId: user._id,
-        detail: `Failed login attempt with email: ${email} (wrong password)`
+        detail: `Failed login attempt with email: ${email} (wrong password)`,
+        req
       });
       return res.status(400).json({ message: 'Invalid email or password' });
     }
@@ -66,7 +76,8 @@ exports.login = async (req, res) => {
       action: 'LOGIN',
       entity: 'User',
       entityId: user._id,
-      detail: `User logged in with email: ${email}`
+      detail: `User logged in with email: ${email}`,
+      req
     });
 
     res.json({ token, email: user.email });
