@@ -8,9 +8,13 @@
 
 <script setup>
 import LoginForm from '../components/LoginForm.vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 function onLoginSuccess() {
-  alert('Login สำเร็จ! เดี๋ยวพาไปหน้า Vault')
-  // จะทำ redirect ต่อได้ที่นี่ เช่น router.push('/vault')
+  alert('Login สำเร็จ!')
+  router.push('/home')  
 }
 </script>
+
